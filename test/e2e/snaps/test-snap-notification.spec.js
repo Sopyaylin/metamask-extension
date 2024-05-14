@@ -2,7 +2,6 @@ const {
   defaultGanacheOptions,
   withFixtures,
   unlockWallet,
-  switchToNotificationWindow,
   WINDOW_TITLES,
 } = require('../helpers');
 const FixtureBuilder = require('../fixture-builder');
@@ -35,7 +34,16 @@ describe('Test Snap Notification', function () {
         await driver.clickElement('#connectnotifications');
 
         // switch to metamask extension and click connect
-        await switchToNotificationWindow(driver);
+        const windowHandles = await driver.waitUntilXWindowHandles(
+          3,
+          1000,
+          10000,
+        );
+        const extensionPage = windowHandles[0];
+        await driver.switchToWindowWithTitle(
+          WINDOW_TITLES.Dialog,
+          windowHandles,
+        );
         await driver.clickElement({
           text: 'Connect',
           tag: 'button',
@@ -56,7 +64,7 @@ describe('Test Snap Notification', function () {
         });
 
         // click send inputs on test snap page
-        await driver.switchToWindowWithTitle(WINDOW_TITLES.TestSnaps);
+        await driver.switchToWindowWithTitle('Test Snaps', windowHandles);
 
         // wait for npm installation success
         await driver.waitForSelector({
@@ -67,9 +75,7 @@ describe('Test Snap Notification', function () {
         await driver.clickElement('#sendInAppNotification');
 
         // switch back to the extension page
-        await driver.switchToWindowWithTitle(
-          WINDOW_TITLES.ExtensionInFullScreenView,
-        );
+        await driver.switchToWindow(extensionPage);
 
         // check to see that there is one notification
         await driver.waitForSelector(

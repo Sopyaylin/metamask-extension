@@ -2,7 +2,6 @@ const {
   defaultGanacheOptions,
   withFixtures,
   unlockWallet,
-  switchToNotificationWindow,
   WINDOW_TITLES,
 } = require('../helpers');
 const FixtureBuilder = require('../fixture-builder');
@@ -34,7 +33,15 @@ describe('Test Snap Get File', function () {
         await driver.clickElement('#connectgetfile');
 
         // switch to metamask extension and click connect
-        await switchToNotificationWindow(driver);
+        const windowHandles = await driver.waitUntilXWindowHandles(
+          3,
+          1000,
+          10000,
+        );
+        await driver.switchToWindowWithTitle(
+          WINDOW_TITLES.Dialog,
+          windowHandles,
+        );
         await driver.clickElement({
           text: 'Connect',
           tag: 'button',
@@ -55,7 +62,7 @@ describe('Test Snap Get File', function () {
         });
 
         // switch to test snaps tab
-        await driver.switchToWindowWithTitle(WINDOW_TITLES.TestSnaps);
+        await driver.switchToWindowWithTitle('Test Snaps', windowHandles);
 
         // wait for npm installation success
         await driver.waitForSelector({

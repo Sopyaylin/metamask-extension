@@ -3,7 +3,6 @@ const {
   withFixtures,
   switchToNotificationWindow,
   unlockWallet,
-  WINDOW_TITLES,
 } = require('../helpers');
 const FixtureBuilder = require('../fixture-builder');
 const { TEST_SNAPS_WEBSITE_URL } = require('./enums');
@@ -69,7 +68,7 @@ describe('Test Snap RPC', function () {
         });
 
         // switch back to test-snaps window
-        await driver.switchToWindowWithTitle(WINDOW_TITLES.TestSnaps);
+        await driver.switchToWindowWithTitle('Test Snaps');
 
         const snapButton2 = await driver.findElement('#connectjson-rpc');
         await driver.scrollToElement(snapButton2);
@@ -96,7 +95,7 @@ describe('Test Snap RPC', function () {
           tag: 'button',
         });
 
-        await driver.switchToWindowWithTitle(WINDOW_TITLES.TestSnaps);
+        await driver.switchToWindowWithTitle('Test Snaps');
 
         // wait for npm installation success
         await driver.waitForSelector({

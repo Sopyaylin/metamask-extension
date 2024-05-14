@@ -2,7 +2,6 @@ const {
   withFixtures,
   switchToNotificationWindow,
   unlockWallet,
-  WINDOW_TITLES,
 } = require('../helpers');
 const FixtureBuilder = require('../fixture-builder');
 const { TEST_SNAPS_WEBSITE_URL } = require('./enums');
@@ -77,7 +76,12 @@ describe('Test Snap update via snaps component', function () {
         });
 
         // navigate to test snap page
-        await driver.switchToWindowWithTitle(WINDOW_TITLES.TestSnaps);
+        const windowHandles = await driver.waitUntilXWindowHandles(
+          2,
+          1000,
+          10000,
+        );
+        await driver.switchToWindow(windowHandles[1]);
 
         // wait for npm installation success
         await driver.waitForSelector({
@@ -86,9 +90,8 @@ describe('Test Snap update via snaps component', function () {
         });
 
         // switch to the original MM tab
-        await driver.switchToWindowWithTitle(
-          WINDOW_TITLES.ExtensionInFullScreenView,
-        );
+        const extensionPage = windowHandles[0];
+        await driver.switchToWindow(extensionPage);
 
         // click on the global action menu
         await driver.waitForSelector(

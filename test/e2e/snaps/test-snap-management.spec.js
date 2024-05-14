@@ -2,7 +2,6 @@ const {
   defaultGanacheOptions,
   withFixtures,
   unlockWallet,
-  switchToNotificationWindow,
   WINDOW_TITLES,
 } = require('../helpers');
 const FixtureBuilder = require('../fixture-builder');
@@ -35,7 +34,15 @@ describe('Test Snap Management', function () {
         await driver.clickElement('#connectnotifications');
 
         // switch to metamask extension and click connect
-        await switchToNotificationWindow(driver);
+        let windowHandles = await driver.waitUntilXWindowHandles(
+          3,
+          1000,
+          10000,
+        );
+        await driver.switchToWindowWithTitle(
+          WINDOW_TITLES.Dialog,
+          windowHandles,
+        );
         await driver.clickElement({
           text: 'Connect',
           tag: 'button',
@@ -56,9 +63,8 @@ describe('Test Snap Management', function () {
         });
 
         // switch to the original MM tab
-        await driver.switchToWindowWithTitle(
-          WINDOW_TITLES.ExtensionInFullScreenView,
-        );
+        const extensionPage = windowHandles[0];
+        await driver.switchToWindow(extensionPage);
 
         // click on the global action menu
         await driver.waitForSelector(
@@ -86,7 +92,8 @@ describe('Test Snap Management', function () {
         await driver.clickElement('.toggle-button > div');
 
         // switch back to test-snaps window
-        await driver.switchToWindowWithTitle(WINDOW_TITLES.TestSnaps);
+        windowHandles = await driver.waitUntilXWindowHandles(2, 1000, 10000);
+        await driver.switchToWindowWithTitle('Test Snaps', windowHandles);
 
         // wait then try the notification test
         await driver.waitForSelector('#sendInAppNotification');
@@ -97,25 +104,21 @@ describe('Test Snap Management', function () {
         await driver.closeAlertPopup();
 
         // switch back to snaps page
-        await driver.switchToWindowWithTitle(
-          WINDOW_TITLES.ExtensionInFullScreenView,
-        );
+        await driver.switchToWindow(extensionPage);
 
         // try to re-enaable the snap
         await driver.waitForSelector('.toggle-button > div');
         await driver.clickElement('.toggle-button > div');
 
         // switch back to test snaps page
-        await driver.switchToWindowWithTitle(WINDOW_TITLES.TestSnaps);
+        await driver.switchToWindowWithTitle('Test Snaps', windowHandles);
 
         // wait then try the notification test
         await driver.waitForSelector('#sendInAppNotification');
         await driver.clickElement('#sendInAppNotification');
 
         // check to see that there is one notification
-        await driver.switchToWindowWithTitle(
-          WINDOW_TITLES.ExtensionInFullScreenView,
-        );
+        await driver.switchToWindow(extensionPage);
         await driver.waitForSelector(
           '[data-testid="account-options-menu-button"]',
         );

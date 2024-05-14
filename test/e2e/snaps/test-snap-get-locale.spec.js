@@ -2,7 +2,6 @@ const {
   defaultGanacheOptions,
   withFixtures,
   unlockWallet,
-  switchToNotificationWindow,
   WINDOW_TITLES,
 } = require('../helpers');
 const FixtureBuilder = require('../fixture-builder');
@@ -34,7 +33,15 @@ describe('Test Snap Get Locale', function () {
         await driver.clickElement('#connectgetlocale');
 
         // switch to metamask extension and click connect
-        await switchToNotificationWindow(driver);
+        let windowHandles = await driver.waitUntilXWindowHandles(
+          3,
+          1000,
+          10000,
+        );
+        await driver.switchToWindowWithTitle(
+          WINDOW_TITLES.Dialog,
+          windowHandles,
+        );
         await driver.clickElement({
           text: 'Connect',
           tag: 'button',
@@ -63,7 +70,7 @@ describe('Test Snap Get Locale', function () {
         });
 
         // switch to test snaps tab
-        await driver.switchToWindowWithTitle(WINDOW_TITLES.TestSnaps);
+        await driver.switchToWindowWithTitle('Test Snaps', windowHandles);
 
         // wait for npm installation success
         await driver.waitForSelector({
@@ -83,9 +90,8 @@ describe('Test Snap Get Locale', function () {
         // try switching language to dansk
         //
         // switch to the original MM tab
-        await driver.switchToWindowWithTitle(
-          WINDOW_TITLES.ExtensionInFullScreenView,
-        );
+        const extensionPage = windowHandles[0];
+        await driver.switchToWindow(extensionPage);
 
         // click on the global action menu
         await driver.waitForSelector(
@@ -130,7 +136,8 @@ describe('Test Snap Get Locale', function () {
         await driver.waitForSelector({ text: 'Oversættelses Eksempel Snap' });
 
         // switch back to test snaps tab
-        await driver.switchToWindowWithTitle(WINDOW_TITLES.TestSnaps);
+        windowHandles = await driver.waitUntilXWindowHandles(2, 1000, 10000);
+        await driver.switchToWindowWithTitle('Test Snaps', windowHandles);
 
         // click on alert dialog
         await driver.clickElement('#sendGetLocaleHelloButton');

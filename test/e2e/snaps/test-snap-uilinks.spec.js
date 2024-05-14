@@ -2,7 +2,6 @@ const {
   defaultGanacheOptions,
   withFixtures,
   unlockWallet,
-  switchToNotificationWindow,
   WINDOW_TITLES,
 } = require('../helpers');
 const FixtureBuilder = require('../fixture-builder');
@@ -27,9 +26,18 @@ describe('Test Snap UI Links', function () {
         await driver.scrollToElement(dialogButton);
         await driver.delay(1000);
         await driver.clickElement('#connectdialogs');
+        await driver.delay(1000);
 
         // switch to metamask extension and click connect
-        await switchToNotificationWindow(driver);
+        let windowHandles = await driver.waitUntilXWindowHandles(
+          3,
+          1000,
+          10000,
+        );
+        await driver.switchToWindowWithTitle(
+          WINDOW_TITLES.Dialog,
+          windowHandles,
+        );
         await driver.clickElement({
           text: 'Connect',
           tag: 'button',
@@ -50,7 +58,7 @@ describe('Test Snap UI Links', function () {
         });
 
         // switch to test snaps tab
-        await driver.switchToWindowWithTitle(WINDOW_TITLES.TestSnaps);
+        await driver.switchToWindowWithTitle('Test Snaps', windowHandles);
 
         // wait for npm installation success
         await driver.waitForSelector({
@@ -63,7 +71,11 @@ describe('Test Snap UI Links', function () {
         await driver.delay(500);
 
         // switch to dialog popup
-        await switchToNotificationWindow(driver);
+        windowHandles = await driver.waitUntilXWindowHandles(3, 1000, 10000);
+        await driver.switchToWindowWithTitle(
+          WINDOW_TITLES.Dialog,
+          windowHandles,
+        );
         await driver.delay(500);
 
         // wait for link to appear and click it
@@ -93,7 +105,11 @@ describe('Test Snap UI Links', function () {
         });
 
         // switch to new tab
-        await driver.switchToWindowWithTitle('MetaMask Snaps Directory');
+        windowHandles = await driver.waitUntilXWindowHandles(4, 1000, 10000);
+        await driver.switchToWindowWithTitle(
+          'MetaMask Snaps Directory',
+          windowHandles,
+        );
 
         // check that the correct page has been opened
         await driver.waitForSelector({
@@ -102,7 +118,11 @@ describe('Test Snap UI Links', function () {
         });
 
         // switch back to metamask window
-        await switchToNotificationWindow(driver, 4);
+        windowHandles = await driver.waitUntilXWindowHandles(4, 1000, 10000);
+        await driver.switchToWindowWithTitle(
+          WINDOW_TITLES.Dialog,
+          windowHandles,
+        );
 
         // wait for and click approve button
         await driver.waitForSelector({
@@ -115,7 +135,8 @@ describe('Test Snap UI Links', function () {
         });
 
         // switch back to test snaps tab
-        await driver.switchToWindowWithTitle(WINDOW_TITLES.TestSnaps);
+        windowHandles = await driver.waitUntilXWindowHandles(4, 1000, 10000);
+        await driver.switchToWindowWithTitle('Test Snaps', windowHandles);
 
         // check for false result
         await driver.waitForSelector({

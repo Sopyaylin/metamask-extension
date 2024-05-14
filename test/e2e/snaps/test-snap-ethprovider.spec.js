@@ -2,7 +2,6 @@ const {
   defaultGanacheOptions,
   withFixtures,
   unlockWallet,
-  switchToNotificationWindow,
   WINDOW_TITLES,
 } = require('../helpers');
 const FixtureBuilder = require('../fixture-builder');
@@ -36,7 +35,15 @@ describe('Test Snap ethereum_provider', function () {
         await driver.clickElement('#connectethereum-provider');
 
         // switch to metamask extension and click connect
-        await switchToNotificationWindow(driver, 2);
+        const windowHandles = await driver.waitUntilXWindowHandles(
+          2,
+          1000,
+          10000,
+        );
+        await driver.switchToWindowWithTitle(
+          WINDOW_TITLES.Dialog,
+          windowHandles,
+        );
         await driver.clickElement({
           text: 'Connect',
           tag: 'button',
@@ -57,7 +64,7 @@ describe('Test Snap ethereum_provider', function () {
         });
 
         // switch to test snap page
-        await driver.switchToWindowWithTitle(WINDOW_TITLES.TestSnaps);
+        await driver.switchToWindowWithTitle('Test Snaps', windowHandles);
 
         // wait for npm installation success
         await driver.waitForSelector({
@@ -86,7 +93,15 @@ describe('Test Snap ethereum_provider', function () {
         await driver.clickElement('#sendEthproviderAccounts');
 
         // switch to metamask window and click through confirmations
-        await switchToNotificationWindow(driver, 2);
+        const windowHandles2 = await driver.waitUntilXWindowHandles(
+          2,
+          1000,
+          10000,
+        );
+        await driver.switchToWindowWithTitle(
+          WINDOW_TITLES.Dialog,
+          windowHandles2,
+        );
         await driver.clickElement({
           text: 'Next',
           tag: 'button',
@@ -101,7 +116,7 @@ describe('Test Snap ethereum_provider', function () {
         });
 
         // switch to test snap page
-        await driver.switchToWindowWithTitle(WINDOW_TITLES.TestSnaps);
+        await driver.switchToWindowWithTitle('Test Snaps', windowHandles);
 
         // check the results of the message signature using waitForSelector
         await driver.waitForSelector({
